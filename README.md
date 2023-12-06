@@ -7,3 +7,4 @@
 |Open water | Open water|
 |Paved | Verhard |
 |Unpaved | Onverhard |
+|Water level | waterpeil |
