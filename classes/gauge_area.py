@@ -9,6 +9,8 @@ class Gauge_area():
         self.neighbours = {}
         self.volume = None
         self.waterlevel = None
+        self.discharge = None
+        self.supply = None
 
     def add_neighbours(self, gauge_area):
         """Add neighbours to the gauge_area"""
@@ -35,8 +37,15 @@ class Gauge_area():
 
     def set_waterlevel(self, waterlevel):
         self.waterlevel = waterlevel
-    
-    
+
+    def set_discharge(self, discharge):
+        self.discharge = discharge
+
+    def set_supply(self, supply):
+        self.supply = supply
+
+    def set_volume(self, volume):
+        self.volume = volume
         
     def __repr__(self):
         return f'(gauge_area_id: {self.area_id})'

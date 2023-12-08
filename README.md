@@ -7,4 +7,6 @@
 |Open water | Open water|
 |Paved | Verhard |
 |Unpaved | Onverhard |
-|Water level | waterpeil |
+|Water level | Waterpeil |
+|Discharge | Afvoer |
+|Supply | Aanvoer|
