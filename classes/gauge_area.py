@@ -52,23 +52,23 @@ class Gauge_area():
 
 
 
-#Test code
-gauge_area_1 = Gauge_area(1, 20, 30, 50, 20) 
-gauge_area_2 = Gauge_area(2, 20, 30, 50, 20)
-gauge_area_3 = Gauge_area(3, 20, 30, 50, 20)
+# #Test code
+# gauge_area_1 = Gauge_area(1, 20, 30, 50, 20) 
+# gauge_area_2 = Gauge_area(2, 20, 30, 50, 20)
+# gauge_area_3 = Gauge_area(3, 20, 30, 50, 20)
 
-gauge_area_1.add_neighbours(gauge_area_2)
-gauge_area_1.add_neighbours(gauge_area_3)
+# gauge_area_1.add_neighbours(gauge_area_2)
+# gauge_area_1.add_neighbours(gauge_area_3)
 
-print(gauge_area_1.get_neighbours())
+# print(gauge_area_1.get_neighbours())
 
-gauge_area_1.remove_neighbour(gauge_area_2)
+# gauge_area_1.remove_neighbour(gauge_area_2)
 
-print(gauge_area_1.get_neighbours())
+# print(gauge_area_1.get_neighbours())
 
-print(f"open water: {gauge_area_1.get_area_openwater()}")
-print(f"verhard: {gauge_area_1.get_area_paved()}")
-print(f"onverhard: {gauge_area_1.get_area_unpaved()}")
+# print(f"open water: {gauge_area_1.get_area_openwater()}")
+# print(f"verhard: {gauge_area_1.get_area_paved()}")
+# print(f"onverhard: {gauge_area_1.get_area_unpaved()}")
 
-gauge_area_1.set_waterlevel(5)
-print(gauge_area_1.waterlevel)
+# gauge_area_1.set_waterlevel(5)
+# print(gauge_area_1.waterlevel)
