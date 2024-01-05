@@ -32,12 +32,12 @@ var_percentage_unpaved = tk.IntVar()
 
 #entry labelsc
 label_percipitation = ttk.Label(master= input_frame_percipitation, text= 'neerslag').pack(side= 'left', padx= 10)
-label_evaporation = ttk.Label(master= input_frame_evaporation, text= 'verdamping').pack(side= 'left')
-label_area = ttk.Label(master= input_frame_area, text= 'oppervlakte').pack(side= 'left')
-label_soil = ttk.Label(master= input_frame_soil, text= 'grondsoort').pack(side= 'left')
-label_percentage_openwater = ttk.Label(master= input_frame_percentage_openwater, text= 'percentage open water').pack(side= 'left')
-label_percentage_paved = ttk.Label(master= input_frame_percentage_paved, text= 'percentage verhard').pack(side= 'left')
-label_percentage_unpaved = ttk.Label(master= input_frame_percentage_unpaved, text= 'percentage onverhard').pack(side= 'left')
+label_evaporation = ttk.Label(master= input_frame_evaporation, text= 'verdamping').pack(side= 'left', padx= 10)
+label_area = ttk.Label(master= input_frame_area, text= 'oppervlakte').pack(side= 'left', padx= 10)
+label_soil = ttk.Label(master= input_frame_soil, text= 'grondsoort').pack(side= 'left', padx= 10)
+label_percentage_openwater = ttk.Label(master= input_frame_percentage_openwater, text= 'percentage open water').pack(side= 'left', padx= 10)
+label_percentage_paved = ttk.Label(master= input_frame_percentage_paved, text= 'percentage verhard').pack(side= 'left', padx= 10)
+label_percentage_unpaved = ttk.Label(master= input_frame_percentage_unpaved, text= 'percentage onverhard').pack(side= 'left', padx= 10)
 
 
 # entry fields
@@ -49,14 +49,18 @@ entry_percentage_openwater = ttk.Entry(master= input_frame_percentage_openwater,
 entry_percentage_paved = ttk.Entry(master= input_frame_percentage_paved, textvariable= var_percentage_paved).pack(side= 'right')
 entry_percentage_unpaved = ttk.Entry(master= input_frame_percentage_unpaved, textvariable= var_percentage_unpaved).pack(side= 'right')
 
-input_frame_percipitation.pack()
-input_frame_evaporation.pack()
-input_frame_area.pack()
-input_frame_soil.pack()
-input_frame_percentage_openwater.pack()
-input_frame_percentage_paved.pack()
+input_frame_percipitation.pack(pady= 10)
+input_frame_evaporation.pack(pady= 10)
+input_frame_area.pack(pady= 10)
+input_frame_soil.pack(pady= 10)
+input_frame_percentage_openwater.pack(pady= 10)
+input_frame_percentage_paved.pack(pady= 10)
 input_frame_percentage_unpaved.pack()
 
 input_frame.pack()
+
+# output
+
+
 #run
 window.mainloop()
