@@ -1,9 +1,9 @@
 import matplotlib.pyplot as plt
 
-def p_o():
+def percipitation_unpaved():
     return 1.5
 
-def p_v(t):
+def percipitation_paved(t):
     if t < 1:
         return 0
     elif t >= 1 and t < 2: 
@@ -11,7 +11,7 @@ def p_v(t):
     else:
         return 0
 
-def p_w(t):
+def percipitation_water(t):
     if t < 1:
         return 0
     elif t >= 1 and t < 2: 
@@ -19,20 +19,19 @@ def p_w(t):
     else:
         return 0
 
-def s():
+def seepage():
     return -0.009
 
-def e_w():
+def evaporation_water():
     return 0.0
 
-def e_o():
+def evaporation_unpaved():
     return 0.208
 
 def pump():
     return 5
 
 def hoogte():
-    
     
     t = 0
     dt = 0.1
@@ -45,7 +44,7 @@ def hoogte():
 
     while t < t_eind:
         # breakpoint()
-        h0 = h0 + (p_o() + p_v(t) + p_w(t) + s() - e_w() - e_o() - pump()) * dt
+        h0 = h0 + (percipitation_unpaved() + percipitation_paved(t) + percipitation_water(t) + seepage() - evaporation_water() - evaporation_unpaved() - pump()) * dt
         h_list.append(round(h0,2))
         t_list.append(t)
         t += dt
@@ -53,10 +52,5 @@ def hoogte():
     plt.plot(t_list,h_list)
     
     plt.show()
-    
-    print(t_list)
-    print(h_list)
-
-    return h_list, t_list
 
 hoogte()
