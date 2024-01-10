@@ -23,9 +23,12 @@ def page_two():
     global evaporation
     evaporation = st.selectbox('Selecteer een seizoen voor de verdamping', ("Lente", "Zomer", "Herfst", "Winter"))
 
+    global area
+    area = st.slider('Geef aan wat de grootte is van de polder in ha', 50, 2000)
+
 #Defenition that contains all the necessary infomation for page 3    
-#def page_three():
-    #xxx
+def page_three():
+    pass
 
 #Code to select a page and to visualise the appropriate information
 st.sidebar.write("""# Selectie menu""")
