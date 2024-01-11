@@ -1,0 +1,28 @@
+from gauge_area import Gauge_area
+
+# function for the waterflow in and out of the system
+def supply(Q, precipitation, t):
+    flow = precipitation - (Q / gauge_area.area)
+    gauge_area.supply = flow * t + gauge_area.waterlevel
+    return gauge_area.supply
+
+# empty lists
+time_list = []
+total_water = []
+
+# defining parameters
+Q = 1
+precipitation = 0.1
+t = 0
+eind_tijd = 10
+gauge_area = Gauge_area(1, 20, 0, 100, 0)
+gauge_area.set_waterlevel(0)
+
+# taking waterflow in the system
+while t <= eind_tijd:
+    time_list.append(t)
+    Qf = supply(Q, precipitation, t)
+    total_water.append(Qf)
+    print(round(Qf,2))
+    t += 1
+
