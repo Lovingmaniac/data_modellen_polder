@@ -1,8 +1,8 @@
 from gauge_area import Gauge_area
 
 # function for the waterflow in and out of the system
-def supply(Q, precipitation, seepage, influent_seepage, t):
-    flow = precipitation + seepage - influent_seepage + (Q / gauge_area.area)
+def supply(Q, precipitation, seepage, influent_seepage, t, pump):
+    flow = precipitation + seepage - pump - influent_seepage + (Q / gauge_area.area)
     gauge_area.supply = flow * t + gauge_area.waterlevel
     return gauge_area.supply
 
