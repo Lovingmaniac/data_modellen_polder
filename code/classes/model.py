@@ -9,16 +9,16 @@ def percipitation_unpaved():
     """
     return 1.5
 
-def percipitation_paved(area_ha, percipitation, t):
+def percipitation_paved(area_ha_paved, percipitation, t):
     """
     Water that will flow over the paved surface into the open water area
     In:
     Out: 
-    Unit: mm/hr
+    Unit: m³/hr
     """
-    area_m2 = area_ha * 10000 #m²
+    area_m2 = area_ha_paved * 10000 #m²
     percipitation_mhr = percipitation / 1000 #m/hr
-    
+
     if t < 1:
         return 0
     elif t >= 1 and t < 2: 
@@ -26,29 +26,33 @@ def percipitation_paved(area_ha, percipitation, t):
     else:
         return 0
 
-def percipitation_water(t):
+def percipitation_water(area_ha_water, percipitation, t):
     """
     Percipitation that will land directly in the open water
     IN:
     OUT:
     Unit: mm/hr
     """
-    
+    area_m2 = area_ha_water * 10000 #m²
+    percipitation_mhr = percipitation / 1000 #m/hr
+
     if t < 1:
         return 0
     elif t >= 1 and t < 2: 
-        return 60
+        return area_m2 * percipitation_mhr #m³/hr
     else:
         return 0
 
-def seepage():
+def seepage(area, seepage):
     """
     Seepage into the system
     Negative --> outgoing
     Positive --> incoming
     Unit: mm/hr
     """
-    return -0.009
+    seepage_mhr = seepage / 1000 / 24
+    area_m2 = area * 10000
+    return seepage_mhr * area_m2
 
 def evaporation_water():
     """
@@ -65,18 +69,20 @@ def evaporation_unpaved():
     """
     return 0.208
 
-def pump():
+def pump(pumpcapacity):
     """
     The amount of water that gets pumped out
-    Unit: mm/hr
+    Unit: m³/hr
     """
-    return 5
+    pumpcapacity_hr = pumpcapacity * 60
+    
+    return pumpcapacity_hr
 
 def hoogte():
     
     t = 0
     dt = 0.1
-    h0 = 0
+    volume_0 = 0
     t_eind = 24
     
     t_list = []
@@ -85,8 +91,8 @@ def hoogte():
 
     while t < t_eind:
         # breakpoint()
-        h0 = h0 + (percipitation_unpaved() + percipitation_paved(area_ha, percipitation, t) + percipitation_water(t) + seepage() - evaporation_water() - evaporation_unpaved() - pump()) * dt
-        h_list.append(round(h0,2))
+        volume_0 = volume_0 + (percipitation_unpaved() + percipitation_paved(area_ha, percipitation, t) + percipitation_water(t) + seepage() - evaporation_water() - evaporation_unpaved() - pump(pumpcapacity)) * dt
+        h_list.append(round(volume_0,2))
         t_list.append(t)
         t += dt
     

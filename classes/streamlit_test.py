@@ -31,6 +31,12 @@ def page_two():
     percentage_water = 100 - percentage_paved - percentage_unpaved
     st.write(f'Verhoudingen polder: \n verhard= {percentage_paved} \n onverhard= {percentage_unpaved} \n openwater= {percentage_water}')
 
+    global pumpcapacity
+    pumpcapacity = st.slider('Geef de pompcapaciteit in m³/min', 0, 3000)
+
+    global seepage
+    seepage = st.slider("Wat is de kwel (positief) of wegzijging (negatief) in mm/dag", min_value=-5, max_value=5, value= 0)
+
         #Create model for groundlevel
     def mv(L, slope, depth, width, groundlevel):
 
