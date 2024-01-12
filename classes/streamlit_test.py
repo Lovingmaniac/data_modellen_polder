@@ -1,5 +1,6 @@
 import streamlit as st
 import matplotlib.pyplot as plt
+import pandas as pd
 
 #Defenition that contains all the necessary information for page 1
 def page_one():
@@ -24,7 +25,7 @@ def page_two():
     season = st.selectbox('Selecteer een seizoen voor de verdamping', ("Lente", "Zomer", "Herfst", "Winter"))
 
     global area
-    area = st.slider("Oppervlakte polder in ha", 50, 20000)
+    area = st.slider("Oppervlakte polder in ha", 50, 20000, value = 100)
 
     global percentage_paved, percentage_unpaved, percentage_water
     percentage_paved = st.slider('Percentage verhard oppervlakte: ', 0, 100)
@@ -146,7 +147,7 @@ def page_two():
 
     groudnwater(precipitation=precipitation, season=season, soil=soil, start_waterlevel=-1, distance_waterways=20, simulation_duration=120)
 
-    time = st.slider(0,120)
+    time = st.slider("tijd",0,120)
 
     #Create model for visualisation
     def visualise():
@@ -207,108 +208,154 @@ def page_two():
 
 
 
-def percipitation_unpaved():
-    """
-    water that will flow through the unpaved surface
-    In: 
-    OUT: 
-    Unit: mm/hr
-    """
-    return 1.5
+    def precipitation_unpaved():
+        """
+        water that will flow through the unpaved surface
+        In: 
+        OUT: 
+        Unit: mm/hr
+        """
+        return 1.5
 
-def percipitation_paved(area_ha_paved, percipitation, t):
-    """
-    Water that will flow over the paved surface into the open water area
-    In:
-    Out: 
-    Unit: m³/hr
-    """
-    area_m2 = area_ha_paved * 10000 #m²
-    percipitation_mhr = percipitation / 1000 #m/hr
+    def precipitation_paved(t):
+        """
+        Water that will flow over the paved surface into the open water area
+        In:
+        Out: 
+        Unit: m³/hr
+        """
 
-    if t < 1:
-        return 0
-    elif t >= 1 and t < 2: 
-        return area_m2 * percipitation_mhr #m³/hr
-    else:
-        return 0
+        area_m2 = area * 10000 #m²
+        area_m2_paved = area_m2 * (percentage_paved/100)
+        precipitation_mhr = rainfall_selection() / 1000 #m/hr
 
-def percipitation_water(area_ha_water, percipitation, t):
-    """
-    Percipitation that will land directly in the open water
-    IN:
-    OUT:
-    Unit: mm/hr
-    """
-    area_m2 = area_ha_water * 10000 #m²
-    percipitation_mhr = percipitation / 1000 #m/hr
+        if t < 1:
+            return 0
+        elif t >= 1 and t < 2: 
+            return area_m2_paved * precipitation_mhr #m³/hr
+        else:
+            return 0
 
-    if t < 1:
-        return 0
-    elif t >= 1 and t < 2: 
-        return area_m2 * percipitation_mhr #m³/hr
-    else:
-        return 0
+    def precipitation_water(t):
+        """
+        Precipitation that will land directly in the open water
+        IN:
+        OUT:
+        Unit: mm/hr
+        """
+        area_m2 = area * 10000 #m²
+        area_m2_water = area_m2 * (percentage_water / 100)
+        precipitation_mhr = rainfall_selection() / 1000 #m/hr
 
-def seepage(area, seepage):
-    """
-    Seepage into the system
-    Negative --> outgoing
-    Positive --> incoming
-    Unit: mm/hr
-    """
-    seepage_mhr = seepage / 1000 / 24
-    area_m2 = area * 10000
-    return seepage_mhr * area_m2
+        if t < 1:
+            return 0
+        elif t >= 1 and t < 2: 
+            return area_m2_water * precipitation_mhr #m³/hr
+        else:
+            return 0
 
-def evaporation_water(area_ha_water):
-    """
-    Evaporation over the surface of the water
-    Unit: mm/hr
-    """
+    def seepage_in():
+        """
+        Seepage into the system
+        Negative --> outgoing
+        Positive --> incoming
+        Unit: mm/hr
+        """
+        seepage_mhr = seepage / 1000 / 24
+        area_m2 = area * 10000
+        return seepage_mhr * area_m2
+
+    def evaporation_water():
+        """
+        Evaporation over the surface of the water
+        Unit: m³/hr
+        """
+        
+        evaporation = season_selection() #mm/hr
+        area_m2 = area * 10000
+        area_water_m2 = area_m2 * (percentage_water/100)
+
+        output = evaporation/1000
+        return output
+
+    def evaporation_unpaved():
+        """
+        Evaporation over the unpaved surface
+        Unit: m/hr
+        """
+        evaporation = season_selection() #mm/hr
+        area_m2 = area * 10000
+        area_water_m2 = area_m2 * (percentage_unpaved/100)
+
+        output = evaporation/1000
+
+        return output
+
+    def pump():
+        """
+        The amount of water that gets pumped out
+        Unit: m³/hr
+        """
+        pumpcapacity_hr = pumpcapacity * 60
+        
+        return pumpcapacity_hr
+
+    def rainfall_selection():
+        if precipitation == '40mm':
+            return 40
+        elif precipitation == '60mm':
+            return 60
+        elif precipitation == '80mm':
+            return 80
+        elif precipitation == '100mm':
+            return 100
+
+    def season_selection():
+        if season == 'Lente':
+            return 0.083
+        elif season == 'Zomer':
+            return 0.124
+        elif season == 'Herfst':
+            return 0.033
+        elif season == 'Winter':
+            return 0.013
+
+
+    def hoogte():
+        
+        t = 0
+        dt = 0.1
+        volume_0 = 0
+        t_eind = 24
+        
+        t_list = []
+        v_list = []
+        h_list = []
+
+        area_water = area * 10000 * (percentage_water/100)
+
+        while t < t_eind:
+            # breakpoint()
+            volume_0 = volume_0 + (precipitation_unpaved() + precipitation_paved(t) + precipitation_water(t) + seepage_in() - evaporation_water() - evaporation_unpaved() - pump()) * dt
+            h = volume_0 / area_water
+            v_list.append(round(volume_0,2))
+            t_list.append(t)
+            h_list.append(round(h, 2))
+            t += dt
+        
+        values = {'tijd':t_list, 'volume': v_list, 'hoogte': h_list}
+        output_df = pd.DataFrame(values)
+
+        return output_df
+
+    # def plot(dataframe):
+    #     plt.plot(dataframe['tijd'], dataframe['hoogte'])
+    #     plt.set_xlabel('tijd')
+    #     plt.set_ylabel('hoogte')
+
+    #     st.pyplot()
     
-    return 0.0
-
-def evaporation_unpaved():
-    """
-    Evaporation over the unpaved surface
-    Unit: m/hr
-    """
-    return 0.208
-
-def pump(pumpcapacity):
-    """
-    The amount of water that gets pumped out
-    Unit: m³/hr
-    """
-    pumpcapacity_hr = pumpcapacity * 60
-    
-    return pumpcapacity_hr
-
-
-def hoogte():
-    
-    t = 0
-    dt = 0.1
-    volume_0 = 0
-    t_eind = 24
-    
-    t_list = []
-    h_list = []
-    
-
-    while t < t_eind:
-        # breakpoint()
-        volume_0 = volume_0 + (percipitation_unpaved() + percipitation_paved(area_ha, percipitation, t) + percipitation_water(t) + seepage() - evaporation_water() - evaporation_unpaved() - pump(pumpcapacity)) * dt
-        h_list.append(round(volume_0,2))
-        t_list.append(t)
-        t += dt
-    
-    plt.plot(t_list,h_list)
-    
-    plt.show()
-
-hoogte()
+    # plot(hoogte())
 
 #Defenition that contains all the necessary infomation for page 3    
 # def page_three():
@@ -325,7 +372,8 @@ if menu == 'Welkom':
 elif menu == 'Parameters':
     page_two()
     
-# elif menu == 'Visualisatie':
+elif menu == 'Visualisatie':
+    pass
 #     page_two()
 #     page_three()    
     
