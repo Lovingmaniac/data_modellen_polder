@@ -214,8 +214,6 @@ def page_two():
             marker = {'color' : 'skyblue'}))
 
         st.write(fig)
-        st.write(hgl[time])
-        st.write(hgl)
     
     visualise()
 
