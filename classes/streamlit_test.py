@@ -39,7 +39,28 @@ def page_two():
     global seepage
     seepage = st.slider("Wat is de kwel (positief) of wegzijging (negatief) in mm/dag", min_value=-5, max_value=5, value= 0)
 
-        #Create model for groundlevel
+
+    def rainfall_selection():
+        if precipitation == '40mm':
+            return 40
+        elif precipitation == '60mm':
+            return 60
+        elif precipitation == '80mm':
+            return 80
+        elif precipitation == '100mm':
+            return 100
+
+    def season_selection():
+        if season == 'Lente':
+            return 0.083
+        elif season == 'Zomer':
+            return 0.124
+        elif season == 'Herfst':
+            return 0.033
+        elif season == 'Winter':
+            return 0.013
+        
+    #Create model for groundlevel
     def mv(L, slope, depth, width, groundlevel):
 
         #Point on the x-axis for groundlevel
@@ -215,122 +236,98 @@ def page_two():
     
     visualise()
 
+    def model(): 
+        def precipitation_unpaved():
+            """
+            water that will flow through the unpaved surface
+            In: 
+            OUT: 
+            Unit: mm/hr
+            """
+            return 1.5
 
+        def precipitation_paved(t):
+            """
+            Water that will flow over the paved surface into the open water area
+            In:
+            Out: 
+            Unit: m³/hr
+            """
 
-    def precipitation_unpaved():
-        """
-        water that will flow through the unpaved surface
-        In: 
-        OUT: 
-        Unit: mm/hr
-        """
-        return 1.5
+            area_m2 = area * 10000 #m²
+            area_m2_paved = area_m2 * (percentage_paved/100)
+            precipitation_mhr = rainfall_selection() / 1000 #m/hr
 
-    def precipitation_paved(t):
-        """
-        Water that will flow over the paved surface into the open water area
-        In:
-        Out: 
-        Unit: m³/hr
-        """
+            if t < 1:
+                return 0
+            elif t >= 1 and t < 2: 
+                return area_m2_paved * precipitation_mhr #m³/hr
+            else:
+                return 0
 
-        area_m2 = area * 10000 #m²
-        area_m2_paved = area_m2 * (percentage_paved/100)
-        precipitation_mhr = rainfall_selection() / 1000 #m/hr
+        def precipitation_water(t):
+            """
+            Precipitation that will land directly in the open water
+            IN:
+            OUT:
+            Unit: mm/hr
+            """
+            area_m2 = area * 10000 #m²
+            area_m2_water = area_m2 * (percentage_water / 100)
+            precipitation_mhr = rainfall_selection() / 1000 #m/hr
 
-        if t < 1:
-            return 0
-        elif t >= 1 and t < 2: 
-            return area_m2_paved * precipitation_mhr #m³/hr
-        else:
-            return 0
+            if t < 1:
+                return 0
+            elif t >= 1 and t < 2: 
+                return area_m2_water * precipitation_mhr #m³/hr
+            else:
+                return 0
 
-    def precipitation_water(t):
-        """
-        Precipitation that will land directly in the open water
-        IN:
-        OUT:
-        Unit: mm/hr
-        """
-        area_m2 = area * 10000 #m²
-        area_m2_water = area_m2 * (percentage_water / 100)
-        precipitation_mhr = rainfall_selection() / 1000 #m/hr
+        def seepage_in():
+            """
+            Seepage into the system
+            Negative --> outgoing
+            Positive --> incoming
+            Unit: mm/hr
+            """
+            seepage_mhr = seepage / 1000 / 24
+            area_m2 = area * 10000
+            return seepage_mhr * area_m2
 
-        if t < 1:
-            return 0
-        elif t >= 1 and t < 2: 
-            return area_m2_water * precipitation_mhr #m³/hr
-        else:
-            return 0
+        def evaporation_water():
+            """
+            Evaporation over the surface of the water
+            Unit: m³/hr
+            """
+            
+            evaporation = season_selection() #mm/hr
+            area_m2 = area * 10000
+            area_water_m2 = area_m2 * (percentage_water/100)
 
-    def seepage_in():
-        """
-        Seepage into the system
-        Negative --> outgoing
-        Positive --> incoming
-        Unit: mm/hr
-        """
-        seepage_mhr = seepage / 1000 / 24
-        area_m2 = area * 10000
-        return seepage_mhr * area_m2
+            output = evaporation/1000
+            return output
 
-    def evaporation_water():
-        """
-        Evaporation over the surface of the water
-        Unit: m³/hr
-        """
-        
-        evaporation = season_selection() #mm/hr
-        area_m2 = area * 10000
-        area_water_m2 = area_m2 * (percentage_water/100)
+        def evaporation_unpaved():
+            """
+            Evaporation over the unpaved surface
+            Unit: m/hr
+            """
+            evaporation = season_selection() #mm/hr
+            area_m2 = area * 10000
+            area_water_m2 = area_m2 * (percentage_unpaved/100)
 
-        output = evaporation/1000
-        return output
+            output = evaporation/1000
 
-    def evaporation_unpaved():
-        """
-        Evaporation over the unpaved surface
-        Unit: m/hr
-        """
-        evaporation = season_selection() #mm/hr
-        area_m2 = area * 10000
-        area_water_m2 = area_m2 * (percentage_unpaved/100)
+            return output
 
-        output = evaporation/1000
-
-        return output
-
-    def pump():
-        """
-        The amount of water that gets pumped out
-        Unit: m³/hr
-        """
-        pumpcapacity_hr = pumpcapacity * 60
-        
-        return pumpcapacity_hr
-
-    def rainfall_selection():
-        if precipitation == '40mm':
-            return 40
-        elif precipitation == '60mm':
-            return 60
-        elif precipitation == '80mm':
-            return 80
-        elif precipitation == '100mm':
-            return 100
-
-    def season_selection():
-        if season == 'Lente':
-            return 0.083
-        elif season == 'Zomer':
-            return 0.124
-        elif season == 'Herfst':
-            return 0.033
-        elif season == 'Winter':
-            return 0.013
-
-
-    def hoogte():
+        def pump():
+            """
+            The amount of water that gets pumped out
+            Unit: m³/hr
+            """
+            pumpcapacity_hr = pumpcapacity * 60
+            
+            return pumpcapacity_hr
         
         t = 0
         dt = 0.1
@@ -357,14 +354,7 @@ def page_two():
 
         return output_df
 
-    # def plot(dataframe):
-    #     plt.plot(dataframe['tijd'], dataframe['hoogte'])
-    #     plt.set_xlabel('tijd')
-    #     plt.set_ylabel('hoogte')
-
-    #     st.pyplot()
-    
-    # plot(hoogte())
+    st.write(model().head())
 
 #Defenition that contains all the necessary infomation for page 3    
 # def page_three():
