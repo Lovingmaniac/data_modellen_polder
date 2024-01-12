@@ -337,7 +337,7 @@ def page_two():
 
         return output_df
 
-    st.write(model().head())
+    st.write(model().describe())
 
 #Defenition that contains all the necessary infomation for page 3    
 # def page_three():
