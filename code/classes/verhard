@@ -1,6 +1,6 @@
 from gauge_area import Gauge_area
 
-# function for the waterflow in and out of the system
+# function for the waterflow out of the paved area
 def supply(Q, precipitation, t):
     waterlevel = precipitation - Q * t / gauge_area.area
     #gauge_area.supply = waterlevel + gauge_area.waterlevel
@@ -18,10 +18,15 @@ eind_tijd = 10
 gauge_area = Gauge_area(1, 20, 0, 100, 0)
 gauge_area.set_waterlevel(0)
 
-# taking waterflow in the system
+# waterflow on the paved system
 while t <= eind_tijd:
     time_list.append(t)
     Qf = supply(Q, precipitation, t)
     total_water.append(Qf)
+    if Qf <= 0:
+        Qf = 0
+        break
+    if Qf >= 0.001:
+        continue
     print(round(Qf,3))
     t += 1
