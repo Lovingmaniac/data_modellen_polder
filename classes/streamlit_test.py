@@ -1,6 +1,7 @@
 import streamlit as st
 import matplotlib.pyplot as plt
 import pandas as pd
+import plotly_express as px
 
 #Defenition that contains all the necessary information for page 1
 def page_one():
@@ -11,33 +12,36 @@ def page_one():
 
 #Defenition that contains all the necessary information for page 2
 def page_two():
-    st.header("Parameters")
-    st.write("Vul onderstaande parameters in om een polder na te bootsen.")
-    st.write()
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.header("Parameters")
+        st.write("Vul onderstaande parameters in om een polder na te bootsen.")
+        st.write()
 
-    global soil
-    soil = st.selectbox('Selecteer de grondsoort', ("Zand", "Klei", "Veen"))
+        global soil
+        soil = st.selectbox('Selecteer de grondsoort', ("Zand", "Klei", "Veen"))
 
-    global precipitation
-    precipitation = st.selectbox('Selecteerd het aantal mm neerslag', ("40mm", "60mm", "80mm", "100mm"))
+        global precipitation
+        precipitation = st.selectbox('Selecteerd het aantal mm neerslag', ("40mm", "60mm", "80mm", "100mm"))
 
-    global season
-    season = st.selectbox('Selecteer een seizoen voor de verdamping', ("Lente", "Zomer", "Herfst", "Winter"))
+        global season
+        season = st.selectbox('Selecteer een seizoen voor de verdamping', ("Lente", "Zomer", "Herfst", "Winter"))
 
-    global area
-    area = st.slider("Oppervlakte polder in ha", 50, 20000, value = 100)
+        global area
+        area = st.slider("Oppervlakte polder in ha", 50, 20000, value = 8000)
 
-    global percentage_paved, percentage_unpaved, percentage_water
-    percentage_paved = st.slider('Percentage verhard oppervlakte: ', 0, 100)
-    percentage_unpaved = st.slider('Percentage onverhard oppervlakte: ', 0, 100-percentage_paved)
-    percentage_water = 100 - percentage_paved - percentage_unpaved
-    st.write(f'Verhoudingen polder: \n verhard= {percentage_paved} \n onverhard= {percentage_unpaved} \n openwater= {percentage_water}')
+        global percentage_paved, percentage_unpaved, percentage_water
+        percentage_paved = st.slider('Percentage verhard oppervlakte: ', 0, 97, value= 30)
+        percentage_unpaved = st.slider('Percentage onverhard oppervlakte: ', 1, 99-percentage_paved)
+        percentage_water = 100 - percentage_paved - percentage_unpaved
+        st.write(f'Verhoudingen polder: verhard= {percentage_paved}') 
+        st.write(f'onverhard= {percentage_unpaved} openwater= {percentage_water}')
 
-    global pumpcapacity
-    pumpcapacity = st.slider('Geef de pompcapaciteit in m³/min', 0, 3000)
+        global pumpcapacity
+        pumpcapacity = st.slider('Geef de pompcapaciteit in m³/min', 0, 3000, value= 500)
 
-    global seepage
-    seepage = st.slider("Wat is de kwel (positief) of wegzijging (negatief) in mm/dag", min_value=-5, max_value=5, value= 0)
+        global seepage
+        seepage = st.slider("Wat is de kwel (positief) of wegzijging (negatief) in mm/dag", min_value=-5, max_value=5, value= 0)
 
 
     def rainfall_selection():
@@ -146,9 +150,10 @@ def page_two():
             hgl.append(hg)
             t.append(time)
 
-    groundwater(precipitation=precipitation, season=season, soil=soil, start_waterlevel=-0.25, distance_waterways=20, simulation_duration=120)
+    simulation_duration = 120
+    groundwater(precipitation=precipitation, season=season, soil=soil, start_waterlevel=-0.25, distance_waterways=20, simulation_duration= simulation_duration)
 
-    time = st.slider("Tijdverloop in uren",0,120)
+    
 
     #Create model for visualisation
     def visualise():
@@ -215,9 +220,9 @@ def page_two():
 
         st.write(fig)
         st.write(hgl[time])
-        st.write(hgl)
+        # st.write(hgl)
     
-    visualise()
+
 
     def model(): 
         def precipitation_unpaved():
@@ -227,7 +232,9 @@ def page_two():
             OUT: 
             Unit: mm/hr
             """
-            return 1.5
+            area_ha_unpaved = area * (percentage_unpaved/100)
+            volume_l = 1.5 * 3600 * area_ha_unpaved
+            return volume_l/1000
 
         def precipitation_paved(t):
             """
@@ -313,8 +320,8 @@ def page_two():
             return pumpcapacity_hr
         
         t = 0
-        dt = 0.1
-        volume_0 = 0
+        dt = 0.5
+        volume_0 = 50
         t_eind = 24
         
         t_list = []
@@ -324,12 +331,11 @@ def page_two():
         area_water = area * 10000 * (percentage_water/100)
 
         while t < t_eind:
-            # breakpoint()
             volume_0 = volume_0 + (precipitation_unpaved() + precipitation_paved(t) + precipitation_water(t) + seepage_in() - evaporation_water() - evaporation_unpaved() - pump()) * dt
             h = volume_0 / area_water
             v_list.append(round(volume_0,2))
             t_list.append(t)
-            h_list.append(round(h, 2))
+            h_list.append(round(h, 5))
             t += dt
         
         values = {'tijd':t_list, 'volume': v_list, 'hoogte': h_list}
@@ -337,12 +343,21 @@ def page_two():
 
         return output_df
 
-    st.write(model().describe())
+    with col2:
+        st.header('Visualisatie')
+        st.write('[hier komt uitleg over wat je ziet]')
+        time = st.slider("Tijdverloop in uren",0,simulation_duration)
+        visualise()
 
-#Defenition that contains all the necessary infomation for page 3    
-# def page_three():
-#     global time
-#     time = st.slider('Tijdlijn voor aantal uur vanaf de start van de regenbui', 0, 120)
+        st.write('Dit is een titel')
+        plot_waterstand = px.line(model(), x='tijd', y= 'hoogte', range_y= [-0.5, 0.5])
+        plot_volume = px.line(model(), x='tijd', y= 'volume')
+        
+        st.plotly_chart(plot_waterstand)
+
+    with col3: 
+        pass
+
 
 #Code to select a page and to visualise the appropriate information
 st.sidebar.write("""# Selectie menu""")
