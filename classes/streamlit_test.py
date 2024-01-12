@@ -50,6 +50,7 @@ def page_two():
         xe = xd + L
         xf = xe + slope * depth
         xg = xf + width
+        global xh
         xh = xg + slope * depth
 
         #Points on the y-axis for groundlevel
@@ -67,13 +68,11 @@ def page_two():
         global mvy
         mvx = [xa,xb,xc,xd,xe,xf,xg,xh]
         mvy = [ya,yb,yc,yd,ye,yf,yg,yh]
-
-        #return mvx, mvy
         
-    mv(20, 3, 2, 2, 0)
+    mv(100, 3, 0.5, 2, 0)
 
     #Create model for groundwaterlevel
-    def groudnwater(precipitation, season, soil, start_waterlevel, distance_waterways, simulation_duration):
+    def groundwater(precipitation, season, soil, start_waterlevel, distance_waterways, simulation_duration):
         
         #Rainfall selection
         if precipitation == '40mm':
@@ -123,14 +122,14 @@ def page_two():
             #If the waterlevel is below the groundwaterlevel, water will move from the groundwater to the surfacewater at speed q
             if h - hg < 0:
                 i = abs(h - hg) / (0.5 * L)
-                q = (k * i) * 3600
-                hg = hg + P[hour]/1000 - E[hour]/1000 - q
+                Q = (k * i) * 3600 * abs(h-hg) * 2
+                hg = hg + P[hour]/1000 - E[hour]/1000 - Q/L
             
             #If the groundwaterlevel is below the waterlevel, water will move from the groundwater to the surfacewater at speed q
             elif h - hg > 0:
                 i = abs(h - hg) / (0.5 * L)
-                q = (k * i) * 3600
-                hg = hg + P[hour]/1000 - E[hour]/1000 + q
+                Q = (k * i) * 3600 * abs(h-hg) * 2
+                hg = hg + P[hour]/1000 - E[hour]/1000 + Q/L
             
             #If the groundwaterlevel and the waterlevel are equal, no water will move between the waterstorages
             else:
@@ -142,12 +141,10 @@ def page_two():
             #Add the new groundwaterlevel for each hour in the simulation
             hgl.append(hg)
             t.append(time)
-            
-        #return hgl, t
 
-    groudnwater(precipitation=precipitation, season=season, soil=soil, start_waterlevel=-1, distance_waterways=20, simulation_duration=120)
+    groundwater(precipitation=precipitation, season=season, soil=soil, start_waterlevel=-1, distance_waterways=20, simulation_duration=120)
 
-    time = st.slider("tijd",0,120)
+    time = st.slider("Tijdverloop in uren",0,120)
 
     #Create model for visualisation
     def visualise():
@@ -183,7 +180,7 @@ def page_two():
             layout = {
                 'showlegend': False,
                 'xaxis': {
-                    'range': [0, 48],
+                    'range': [0, xh],
                     'showgrid': False,
                     'zeroline': False, 
                     'visible': False
@@ -201,8 +198,20 @@ def page_two():
             y=[hgl[time], hgl[time]], 
             mode='lines', 
             marker = {'color' : 'skyblue'}))
+        fig.add_trace(go.Scatter(
+            x=[int2, int3], 
+            y=[hgl[time], hgl[time]], 
+            mode='lines', 
+            marker = {'color' : 'skyblue'}))
+        fig.add_trace(go.Scatter(
+            x=[int4, xh], 
+            y=[hgl[time], hgl[time]], 
+            mode='lines', 
+            marker = {'color' : 'skyblue'}))
 
         st.write(fig)
+        st.write(hgl[time])
+        st.write(hgl)
     
     visualise()
 
