@@ -22,6 +22,15 @@ def page_two():
     global season
     season = st.selectbox('Selecteer een seizoen voor de verdamping', ("Lente", "Zomer", "Herfst", "Winter"))
 
+    global area
+    area = st.slider("Oppervlakte polder in ha", 50, 20000)
+
+    global percentage_paved, percentage_unpaved, percentage_water
+    percentage_paved = st.slider('Percentage verhard oppervlakte: ', 0, 100)
+    percentage_unpaved = st.slider('Percentage onverhard oppervlakte: ', 0, 100-percentage_paved)
+    percentage_water = 100 - percentage_paved - percentage_unpaved
+    st.write(f'Verhoudingen polder: \n verhard= {percentage_paved} \n onverhard= {percentage_unpaved} \n openwater= {percentage_water}')
+
         #Create model for groundlevel
     def mv(L, slope, depth, width, groundlevel):
 
