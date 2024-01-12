@@ -74,25 +74,8 @@ def page_two():
     #Create model for groundwaterlevel
     def groundwater(precipitation, season, soil, start_waterlevel, distance_waterways, simulation_duration):
         
-        #Rainfall selection
-        if precipitation == '40mm':
-            P = [(40/1000)] + [(0/1000)] * (simulation_duration-1)
-        elif precipitation == '60mm':
-            P = [(60/1000)] + [(0/1000)] * (simulation_duration-1)
-        elif precipitation == '80mm':
-            P = [(80/1000)] + [(0/1000)] * (simulation_duration-1)
-        elif precipitation == '100mm':
-            P = [(100/1000)] + [(0/1000)] * (simulation_duration-1)
-            
-        #Evaporation selection
-        if season == 'Lente':
-            E = [(0.083/1000)] * simulation_duration
-        elif season == 'Zomer':
-            E = [(0.124/1000)] * simulation_duration
-        elif season == 'Herfst':
-            E = [(0.033/1000)] * simulation_duration
-        elif season == 'Winter':
-            E = [(0.013/1000)] * simulation_duration
+        P = [(rainfall_selection()/1000)] + [(0/1000)] * (simulation_duration-1)
+        E = [(season_selection()/1000)] * simulation_duration     
         
         #Soil selection
         if soil == 'Zand':
