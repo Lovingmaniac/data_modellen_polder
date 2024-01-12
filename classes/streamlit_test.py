@@ -130,6 +130,8 @@ def page_two():
 
     groudnwater(precipitation=precipitation, season=season, soil=soil, start_waterlevel=-1, distance_waterways=20, simulation_duration=120)
 
+    time = st.slider(0,120)
+
     #Create model for visualisation
     def visualise():
         import plotly.graph_objects as go
@@ -141,22 +143,22 @@ def page_two():
         #Intersection 1
         a1 = (mv_df.y[1] - mv_df.y[0]) / (mv_df.x[1] - mv_df.x[0])
         b1 = mv_df.y[1] - a1 * mv_df.x[1]
-        int1 = (hgl[0] - b1) / a1
+        int1 = (hgl[time] - b1) / a1
 
         #Intersection 2
         a2 = (mv_df.y[3] - mv_df.y[2]) / (mv_df.x[3] - mv_df.x[2])
         b2 = mv_df.y[3] - a2 * mv_df.x[3]
-        int2 = (hgl[0] - b2) / a2
+        int2 = (hgl[time] - b2) / a2
 
         #Intersection 3
         a3 = (mv_df.y[5] - mv_df.y[4]) / (mv_df.x[5] - mv_df.x[4])
         b3 = mv_df.y[5] - a3 * mv_df.x[5]
-        int3 = (hgl[0] - b3) / a3
+        int3 = (hgl[time] - b3) / a3
 
         #Intersection 4
         a4 = (mv_df.y[7] - mv_df.y[6]) / (mv_df.x[7] - mv_df.x[6])
         b4 = mv_df.y[7] - a4 * mv_df.x[7]
-        int4 = (hgl[0] - b4) / a4
+        int4 = (hgl[time] - b4) / a4
 
         mv_df = pd.DataFrame({'x':mvx, 'y':mvy}) 
 
@@ -179,7 +181,7 @@ def page_two():
             marker = {'color' : 'green'}))
         fig.add_trace(go.Scatter(
             x=[0, int1], 
-            y=[hgl[0], hgl[0]], 
+            y=[hgl[time], hgl[time]], 
             mode='lines', 
             marker = {'color' : 'skyblue'}))
 
