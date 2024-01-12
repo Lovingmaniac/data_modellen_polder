@@ -125,7 +125,7 @@ def page_two():
             hgl.append(hg)
             t.append(time)
 
-    groundwater(precipitation=precipitation, season=season, soil=soil, start_waterlevel=-1, distance_waterways=20, simulation_duration=120)
+    groundwater(precipitation=precipitation, season=season, soil=soil, start_waterlevel=-0.25, distance_waterways=20, simulation_duration=120)
 
     time = st.slider("Tijdverloop in uren",0,120)
 
