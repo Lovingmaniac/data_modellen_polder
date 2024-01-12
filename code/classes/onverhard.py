@@ -18,7 +18,7 @@ def groundwater_ts(neerslag, verdamping, doorlatendheid, simulatieduur, hg0):
     #assign values to variables 
     S = simulatieduur
     hg = hg0
-    k = doorlatendheid
+    k = doorlatendheidpip
     
     #start list with values for t=0
     t_list.append(0)
