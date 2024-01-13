@@ -350,7 +350,8 @@ def page_two():
         visualise()
 
         st.write('Dit is een titel')
-        plot_waterstand = px.line(model(), x='tijd', y= 'hoogte', range_y= [-0.5, 0.5])
+        plot_waterstand = px.line(model(), x='tijd', y= 'hoogte', range_y= [-0.5, 0.5],
+                                   labels= {'tijd': 'tijd (hr)', 'hoogte': 'peilstijging (m)'})
         plot_volume = px.line(model(), x='tijd', y= 'volume')
         
         st.plotly_chart(plot_waterstand)
