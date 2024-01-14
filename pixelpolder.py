@@ -8,8 +8,12 @@ st.set_page_config(layout = 'wide')
 def page_one():
     st.title("DE PIXELPOLDER")
     st.write()
-    st.write("Welkom bij de interactieve poldersimulatie! Laat je het regenen met pijpenstelen of zonnestralen?")
-    st.write("Pas de parameters op pagina 2 aan en bekijk wat het effect is op de waterstanden in de polder.")
+    st.markdown('''
+<span style='font-size:25px'>               
+Welkom bij de interactieve poldersimulatie! Laat je het regenen met pijpenstelen of zonnestralen?
+Pas de parameters op pagina 2 aan en bekijk wat het effect is op de waterstanden in de polder.</span>''', True)
+    st.image('afbeelding (1).png')
+    
 
 #Defenition that contains all the necessary information for page 2
 def page_two():
@@ -346,15 +350,21 @@ def page_two():
 
     with col2:
         st.header('Visualisatie')
-        st.write('''In de grafiek hieronder is een simulatie te zien van de grond- en oppervlaktewater in de tijd.
-                  Met de slider kan aangegegeven worden welke tijdstap getoond moet worden, delijn verplaatst wel, 
-                 maar in een heel kleine mate.''')
+        st.write('''
+### Waterstandsverloop grondwater
+                 
+In de grafiek hieronder is een simulatie te zien van de grondwater in de tijd.
+Met de slider kan aangegegeven worden welke tijdstap getoond moet worden, de lijn verplaatst wel, 
+maar in een heel kleine mate.''')
         time = st.slider("Tijdverloop in uren",0,simulation_duration)
         visualise()
 
-        st.write('''In deze grafiek is het verloop van de waterstand te zien door een neerslag evenenment. 
-                 De neerslag begint na 1 uur en valt daarna gedurende een uur, 
-                 waarbij de hoeveelheid wordt bepaald met het keuzemenu neerslag.''')
+        st.write('''
+### Waterstandsverloop oppervlakte 
+                                  
+In deze grafiek is het verloop van de waterstand te zien door een neerslag evenenment. 
+De neerslag begint na 1 uur en valt daarna gedurende een uur, 
+waarbij de hoeveelheid wordt bepaald met het keuzemenu neerslag.''')
         plot_waterstand = px.line(model(), x='tijd', y= 'hoogte',
                                    labels= {'tijd': 'tijd (hr)', 'hoogte': 'peilstijging (m)'})
         # plot_volume = px.line(model(), x='tijd', y= 'volume')
@@ -728,16 +738,23 @@ def page_three():
 
     with col2:
         st.header('Visualisatie')
-        st.write('''In de grafiek hieronder is een simulatie te zien van de grond- en oppervlaktewater in de tijd.
-                  Met de slider kan aangegegeven worden welke tijdstap getoond moet worden. Deze grafiek werkt het beste 
-                 als de grondsoort Veen is, en het percentage onverhard 1%. Verder is deze code vooral een vorm van magie.''')
+        st.markdown('''
+### waterstandsverloop grondwater
+
+                    
+In de grafiek hieronder is een simulatie te zien van de grond- en oppervlaktewater in de tijd.
+Met de slider kan aangegegeven worden welke tijdstap getoond moet worden. Deze grafiek werkt het beste 
+Als de grondsoort Veen is, en het percentage onverhard 1%. Verder is deze code vooral een vorm van magie.''')
                 
         model_df, fig = model()
         st.write(fig)
 
-        st.write('''In deze grafiek is het verloop van de waterstand te zien door een neerslag evenenment. 
-                 De neerslag begint na 1 uur en valt daarna gedurende een uur, 
-                 waarbij de hoeveelheid wordt bepaald met het keuzemenu neerslag.''')
+        st.markdown('''
+### Waterstandsverloop oppervlakte water
+                    
+In deze grafiek is het verloop van de waterstand te zien door een neerslag evenenment. 
+De neerslag begint na 1 uur en valt daarna gedurende een uur, 
+waarbij de hoeveelheid wordt bepaald met het keuzemenu neerslag.''')
         plot_waterstand = px.line(model_df, x='tijd', y= 'hoogte', range_y= [-0.5, 0.5],
                                    labels= {'tijd': 'tijd (hr)', 'hoogte': 'peilstijging (m)'})
                 
