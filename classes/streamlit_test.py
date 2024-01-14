@@ -107,18 +107,22 @@ def page_two():
             k = 0.01
             
         #Define other start valuables
-        h = start_waterlevel
+        volume0 = area_water * start_waterlevel
+        h = volume0 / area_water
         hg = start_waterlevel
         L = distance_waterways
+        dt = 1
         
         #Create empty lists to fill with resultst with a for-loop
         global hgl
         global t
         hgl = []
+        hl = []
         t = []
         
         #Assign startvalues to lists
         hgl.append(hg)
+        hl.append(h)
         t.append(0)
         
         #For loop to calculate the groundwaterlevel every hour after the specified amount of rainfall
@@ -127,16 +131,22 @@ def page_two():
             if h - hg < 0:
                 i = abs(h - hg) / (0.5 * L)
                 Q = (k * i) * 3600 * abs(h-hg) * 2
+                volume0 = volume0 + ((P[hour]/1000 * area * percentage_unpaved) + precipitation_paved(t) + precipitation_water(t) + seepage_in() + Q/L - evaporation_water() - evaporation_unpaved() - pump()) * dt
+                h = volume_0 / area_water
                 hg = hg + P[hour]/1000 - E[hour]/1000 - Q/L
             
             #If the groundwaterlevel is below the waterlevel, water will move from the groundwater to the surfacewater at speed q
             elif h - hg > 0:
                 i = abs(h - hg) / (0.5 * L)
                 Q = (k * i) * 3600 * abs(h-hg) * 2
+                volume0 = volume0 + ((P[hour]/1000 * area * percentage_unpaved) + precipitation_paved(t) + precipitation_water(t) + seepage_in() - Q/L - evaporation_water() - evaporation_unpaved() - pump()) * dt
+                h = volume_0 / area_water
                 hg = hg + P[hour]/1000 - E[hour]/1000 + Q/L
             
             #If the groundwaterlevel and the waterlevel are equal, no water will move between the waterstorages
             else:
+                volume0 = volume0 + ((P[hour]/1000 * area * percentage_unpaved) + precipitation_paved(t) + precipitation_water(t) + seepage_in() - evaporation_water() - evaporation_unpaved() - pump()) * dt
+                h = volume_0 / area_water
                 hg = hg + P[hour]/1000 - E[hour]/1000
             
             #The time is the amount of hours after startingpoint
@@ -144,6 +154,7 @@ def page_two():
             
             #Add the new groundwaterlevel for each hour in the simulation
             hgl.append(hg)
+            hl.append(h)
             t.append(time)
 
     groundwater(precipitation=precipitation, season=season, soil=soil, start_waterlevel=-0.25, distance_waterways=20, simulation_duration=120)
