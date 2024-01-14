@@ -1,6 +1,4 @@
-python==3.11.7
 streamlit
-plotly
 pandas
 numpy
-openpyxl
+plotly
