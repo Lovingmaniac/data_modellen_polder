@@ -149,7 +149,7 @@ def page_two():
             hgl.append(hg)
             t.append(time)
 
-    simulation_duration = 120
+    simulation_duration = 744
     groundwater(precipitation=precipitation, season=season, soil=soil, start_waterlevel=-0.25, distance_waterways=20, simulation_duration= simulation_duration)
 
     
