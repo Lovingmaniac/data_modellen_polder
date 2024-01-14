@@ -13,6 +13,7 @@ def page_one():
 Welkom bij de interactieve poldersimulatie! Laat je het regenen met pijpenstelen of zonnestralen?
 Pas de parameters op pagina 2 aan en bekijk wat het effect is op de waterstanden in de polder.</span>''', True)
     st.image('afbeelding (1).png')
+    st.write('Bron: https://www.researchgate.net/figure/Diagram-showing-dyke-polder-canal-and-pumping-stations-in-rainy-conditions-Rijnland_fig5_354412146')
     
 
 #Defenition that contains all the necessary information for page 2
