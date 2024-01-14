@@ -3,6 +3,8 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import plotly.express as px
 
+st.set_page_config(layout = 'wide')
+
 #Defenition that contains all the necessary information for page 1
 def page_one():
     st.title("DE PIXELPOLDER")
@@ -246,7 +248,7 @@ def page_two():
             #Assign startvalues to lists
             hgl.append(hg)
             hl.append(h)
-            t.append(0)
+            tl.append(0)
             
             #For loop to calculate the groundwaterlevel every hour after the specified amount of rainfall
             for hour in range(0, simulation_duration):
@@ -364,9 +366,10 @@ def page_two():
                 mode='lines', 
                 marker = {'color' : 'skyblue'}))
             
+            return fig
             #st.write(fig)
             #st.write(hgl[time])       
-
+        fig = visualise()
         return output_df,fig
 
     
@@ -374,15 +377,14 @@ def page_two():
     with col2:
         st.header('Visualisatie')
         st.write('[hier komt uitleg over wat je ziet]')
-        time = st.slider("Tijdverloop in uren",0,simulation_duration)
-        
+                
         model_df, fig = model()
         st.write(fig)
 
         st.write('Dit is een titel')
-        plot_waterstand = px.line(model(), x='tijd', y= 'hoogte', range_y= [-0.5, 0.5],
+        plot_waterstand = px.line(model_df, x='tijd', y= 'hoogte', range_y= [-0.5, 0.5],
                                    labels= {'tijd': 'tijd (hr)', 'hoogte': 'peilstijging (m)'})
-        # plot_volume = px.line(model(), x='tijd', y= 'volume')
+        # plot_volume = px.line(model_df, x='tijd', y= 'volume')
         
         st.plotly_chart(plot_waterstand)
 
