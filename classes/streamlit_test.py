@@ -80,6 +80,7 @@ def page_two():
 
         #Points on the y-axis for groundlevel
         ya = groundlevel
+        global yb
         yb = ya - depth
         yc = yb
         yd = yc + depth
@@ -95,145 +96,6 @@ def page_two():
         mvy = [ya,yb,yc,yd,ye,yf,yg,yh]
         
     mv(100, 3, 0.5, 2, 0)
-
-    #Create model for groundwaterlevel
-    def groundwater(precipitation, season, soil, start_waterlevel, distance_waterways, simulation_duration):
-        
-        P = [(rainfall_selection()/1000)] + [(0/1000)] * (simulation_duration-1)
-        E = [(season_selection()/1000)] * simulation_duration     
-        
-        #Soil selection
-        if soil == 'Zand':
-            k = 5
-        elif soil == 'Klei':
-            k = 0.5
-        elif soil == 'Veen':
-            k = 0.01
-            
-        #Define other start valuables
-        volume0 = area_water * start_waterlevel
-        h = volume0 / area_water
-        hg = start_waterlevel
-        L = distance_waterways
-        dt = 1
-        
-        #Create empty lists to fill with resultst with a for-loop
-        global hgl
-        global t
-        hgl = []
-        hl = []
-        t = []
-        
-        #Assign startvalues to lists
-        hgl.append(hg)
-        hl.append(h)
-        t.append(0)
-        
-        #For loop to calculate the groundwaterlevel every hour after the specified amount of rainfall
-        for hour in range(0, simulation_duration):
-            #If the waterlevel is below the groundwaterlevel, water will move from the groundwater to the surfacewater at speed q
-            if h - hg < 0:
-                i = abs(h - hg) / (0.5 * L)
-                Q = (k * i) * 3600 * abs(h-hg) * 2
-                volume0 = volume0 + ((P[hour]/1000 * area * percentage_unpaved) + precipitation_paved(t) + precipitation_water(t) + seepage_in() + Q/L - evaporation_water() - evaporation_unpaved() - pump()) * dt
-                h = volume_0 / area_water
-                hg = hg + P[hour]/1000 - E[hour]/1000 - Q/L
-            
-            #If the groundwaterlevel is below the waterlevel, water will move from the groundwater to the surfacewater at speed q
-            elif h - hg > 0:
-                i = abs(h - hg) / (0.5 * L)
-                Q = (k * i) * 3600 * abs(h-hg) * 2
-                volume0 = volume0 + ((P[hour]/1000 * area * percentage_unpaved) + precipitation_paved(t) + precipitation_water(t) + seepage_in() - Q/L - evaporation_water() - evaporation_unpaved() - pump()) * dt
-                h = volume_0 / area_water
-                hg = hg + P[hour]/1000 - E[hour]/1000 + Q/L
-            
-            #If the groundwaterlevel and the waterlevel are equal, no water will move between the waterstorages
-            else:
-                volume0 = volume0 + ((P[hour]/1000 * area * percentage_unpaved) + precipitation_paved(t) + precipitation_water(t) + seepage_in() - evaporation_water() - evaporation_unpaved() - pump()) * dt
-                h = volume_0 / area_water
-                hg = hg + P[hour]/1000 - E[hour]/1000
-            
-            #The time is the amount of hours after startingpoint
-            time = hour + 1
-            
-            #Add the new groundwaterlevel for each hour in the simulation
-            hgl.append(hg)
-            hl.append(h)
-            t.append(time)
-
-    simulation_duration = 120
-    groundwater(precipitation=precipitation, season=season, soil=soil, start_waterlevel=-0.25, distance_waterways=20, simulation_duration= simulation_duration)
-
-    
-
-    #Create model for visualisation
-    def visualise():
-        import plotly.graph_objects as go
-        import pandas as pd
-
-        #Code to calculate the intersections between the groundlevel and groundwaterlevel
-        mv_df = pd.DataFrame({'x':mvx, 'y':mvy})
-
-        #Intersection 1
-        a1 = (mv_df.y[1] - mv_df.y[0]) / (mv_df.x[1] - mv_df.x[0])
-        b1 = mv_df.y[1] - a1 * mv_df.x[1]
-        int1 = (hgl[time] - b1) / a1
-
-        #Intersection 2
-        a2 = (mv_df.y[3] - mv_df.y[2]) / (mv_df.x[3] - mv_df.x[2])
-        b2 = mv_df.y[3] - a2 * mv_df.x[3]
-        int2 = (hgl[time] - b2) / a2
-
-        #Intersection 3
-        a3 = (mv_df.y[5] - mv_df.y[4]) / (mv_df.x[5] - mv_df.x[4])
-        b3 = mv_df.y[5] - a3 * mv_df.x[5]
-        int3 = (hgl[time] - b3) / a3
-
-        #Intersection 4
-        a4 = (mv_df.y[7] - mv_df.y[6]) / (mv_df.x[7] - mv_df.x[6])
-        b4 = mv_df.y[7] - a4 * mv_df.x[7]
-        int4 = (hgl[time] - b4) / a4
-
-        mv_df = pd.DataFrame({'x':mvx, 'y':mvy}) 
-
-        fig = go.Figure(
-            layout = {
-                'showlegend': False,
-                'xaxis': {
-                    'range': [0, xh],
-                    'showgrid': False,
-                    'zeroline': False, 
-                    'visible': False
-                }
-            }
-        )
-
-        fig.add_trace(go.Scatter(
-            x=mv_df.x, 
-            y=mv_df.y, 
-            mode='lines', 
-            marker = {'color' : 'green'}))
-        fig.add_trace(go.Scatter(
-            x=[0, int1], 
-            y=[hgl[time], hgl[time]], 
-            mode='lines', 
-            marker = {'color' : 'skyblue'}))
-        fig.add_trace(go.Scatter(
-            x=[int2, int3], 
-            y=[hgl[time], hgl[time]], 
-            mode='lines', 
-            marker = {'color' : 'skyblue'}))
-        fig.add_trace(go.Scatter(
-            x=[int4, xh], 
-            y=[hgl[time], hgl[time]], 
-            mode='lines', 
-            marker = {'color' : 'skyblue'}))
-
-        st.write(fig)
-        st.write(hgl[time])
-        # st.write(hgl)
-    
-
 
     def model(): 
         def precipitation_unpaved():
@@ -352,13 +214,170 @@ def page_two():
         values = {'tijd':t_list, 'volume': v_list, 'hoogte': h_list}
         output_df = pd.DataFrame(values)
 
-        return output_df
+        #Create model for groundwaterlevel
+        def groundwater(precipitation, season, soil, start_waterlevel, distance_waterways, simulation_duration):
+            
+            P = [(rainfall_selection()/1000)] + [(0/1000)] * (simulation_duration-1)
+            E = [(season_selection()/1000)] * simulation_duration     
+            
+            #Soil selection
+            if soil == 'Zand':
+                k = 5
+            elif soil == 'Klei':
+                k = 0.5
+            elif soil == 'Veen':
+                k = 0.01
+                
+            #Define other start valuables
+            volume0 = area_water * start_waterlevel
+            h = volume0 / area_water
+            hg = start_waterlevel
+            L = distance_waterways
+            dt = 1
+            
+            #Create empty lists to fill with resultst with a for-loop
+            global hgl
+            global hl
+            global tl
+            hgl = []
+            hl = []
+            tl = []
+            
+            #Assign startvalues to lists
+            hgl.append(hg)
+            hl.append(h)
+            t.append(0)
+            
+            #For loop to calculate the groundwaterlevel every hour after the specified amount of rainfall
+            for hour in range(0, simulation_duration):
+                #If the waterlevel is below the groundwaterlevel, water will move from the groundwater to the surfacewater at speed q
+                if h - hg < 0:
+                    i = abs(h - hg) / (0.5 * L)
+                    Q = (k * i) * 3600 * abs(h-hg) * 2
+                    volume0 = volume0 + (precipitation_paved(t=(hour+1)) + precipitation_water(t=(hour+1)) + seepage_in() + Q/L - evaporation_water() - evaporation_unpaved() - pump()) * dt
+                    dh = volume_0 / area_water
+                    h = yb + dh
+                    hg = hg + P[hour]/1000 - E[hour]/1000 - Q/L
+                
+                #If the groundwaterlevel is below the waterlevel, water will move from the groundwater to the surfacewater at speed q
+                elif h - hg > 0:
+                    i = abs(h - hg) / (0.5 * L)
+                    Q = (k * i) * 3600 * abs(h-hg) * 2
+                    volume0 = volume0 + (precipitation_paved(t=(hour+1)) + precipitation_water(t=(hour+1)) + seepage_in() - Q/L - evaporation_water() - evaporation_unpaved() - pump()) * dt
+                    dh = volume_0 / area_water
+                    h = yb + dh
+                    hg = hg + P[hour]/1000 - E[hour]/1000 + Q/L
+                
+                #If the groundwaterlevel and the waterlevel are equal, no water will move between the waterstorages
+                else:
+                    volume0 = volume0 + (precipitation_paved(t=(hour+1)) + precipitation_water(t=(hour+1)) + seepage_in() - evaporation_water() - evaporation_unpaved() - pump()) * dt
+                    dh = volume_0 / area_water
+                    h = yb + dh
+                    hg = hg + P[hour]/1000 - E[hour]/1000
+                
+                #The time is the amount of hours after startingpoint
+                time = hour + 1
+                
+                #Add the new groundwaterlevel for each hour in the simulation
+                hgl.append(hg)
+                hl.append(h)
+                tl.append(time)  
+
+        simulation_duration = 120
+        groundwater(precipitation=precipitation, season=season, soil=soil, start_waterlevel=-0.25, distance_waterways=20, simulation_duration= simulation_duration)
+        time = st.slider("Tijdverloop in uren",0,simulation_duration)
+
+        #Create model for visualisation
+        def visualise():
+            import plotly.graph_objects as go
+            import pandas as pd
+
+            #Code to calculate the intersections between the groundlevel and groundwaterlevel
+            mv_df = pd.DataFrame({'x':mvx, 'y':mvy})
+
+            #Intersection 1
+            a1 = (mv_df.y[1] - mv_df.y[0]) / (mv_df.x[1] - mv_df.x[0])
+            b1 = mv_df.y[1] - a1 * mv_df.x[1]
+            int1 = (hgl[time] - b1) / a1
+            inta = (hl[time] - b1) / a1
+
+            #Intersection 2
+            a2 = (mv_df.y[3] - mv_df.y[2]) / (mv_df.x[3] - mv_df.x[2])
+            b2 = mv_df.y[3] - a2 * mv_df.x[3]
+            int2 = (hgl[time] - b2) / a2
+            intb = (hl[time] - b2) / a2
+
+            #Intersection 3
+            a3 = (mv_df.y[5] - mv_df.y[4]) / (mv_df.x[5] - mv_df.x[4])
+            b3 = mv_df.y[5] - a3 * mv_df.x[5]
+            int3 = (hgl[time] - b3) / a3
+            intc = (hl[time] - b3) / a3
+
+            #Intersection 4
+            a4 = (mv_df.y[7] - mv_df.y[6]) / (mv_df.x[7] - mv_df.x[6])
+            b4 = mv_df.y[7] - a4 * mv_df.x[7]
+            int4 = (hgl[time] - b4) / a4
+            intd = (hl[time] - b4) / a4
+
+            mv_df = pd.DataFrame({'x':mvx, 'y':mvy}) 
+
+            fig = go.Figure(
+                layout = {
+                    'showlegend': False,
+                    'xaxis': {
+                        'range': [0, xh],
+                        'showgrid': False,
+                        'zeroline': False, 
+                        'visible': False
+                    }
+                }
+            )
+
+            fig.add_trace(go.Scatter(
+                x=mv_df.x, 
+                y=mv_df.y, 
+                mode='lines', 
+                marker = {'color' : 'green'}))
+            fig.add_trace(go.Scatter(
+                x=[0, int1], 
+                y=[hgl[time], hgl[time]], 
+                mode='lines', 
+                marker = {'color' : 'skyblue'}))
+            fig.add_trace(go.Scatter(
+                x=[int2, int3], 
+                y=[hgl[time], hgl[time]], 
+                mode='lines', 
+                marker = {'color' : 'skyblue'}))
+            fig.add_trace(go.Scatter(
+                x=[int4, xh], 
+                y=[hgl[time], hgl[time]], 
+                mode='lines', 
+                marker = {'color' : 'skyblue'}))
+            fig.add_trace(go.Scatter(
+                x=[inta, intb], 
+                y=[hl[time], hl[time]], 
+                mode='lines', 
+                marker = {'color' : 'skyblue'}))
+            fig.add_trace(go.Scatter(
+                x=[intc, intd], 
+                y=[hl[time], hl[time]], 
+                mode='lines', 
+                marker = {'color' : 'skyblue'}))
+            
+            #st.write(fig)
+            #st.write(hgl[time])       
+
+        return output_df,fig
+
+    
 
     with col2:
         st.header('Visualisatie')
         st.write('[hier komt uitleg over wat je ziet]')
         time = st.slider("Tijdverloop in uren",0,simulation_duration)
-        visualise()
+        
+        model_df, fig = model()
+        st.write(fig)
 
         st.write('Dit is een titel')
         plot_waterstand = px.line(model(), x='tijd', y= 'hoogte', range_y= [-0.5, 0.5],
