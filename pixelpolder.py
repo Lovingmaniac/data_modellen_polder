@@ -231,7 +231,7 @@ def page_two():
             water that will flow through the unpaved surface
             In: 
             OUT: 
-            Unit: mm/hr
+            Unit: m³/hr
             """
             area_ha_unpaved = area * (percentage_unpaved/100)
             volume_l = 1.5 * 3600 * area_ha_unpaved
@@ -261,7 +261,7 @@ def page_two():
             Precipitation that will land directly in the open water
             IN:
             OUT:
-            Unit: mm/hr
+            Unit: m³/hr
             """
             area_m2 = area * 10000 #m²
             area_m2_water = area_m2 * (percentage_water / 100)
@@ -279,7 +279,7 @@ def page_two():
             Seepage into the system
             Negative --> outgoing
             Positive --> incoming
-            Unit: mm/hr
+            Unit: m³/hr
             """
             seepage_mhr = seepage / 1000 / 24
             area_m2 = area * 10000
@@ -301,7 +301,7 @@ def page_two():
         def evaporation_unpaved():
             """
             Evaporation over the unpaved surface
-            Unit: m/hr
+            Unit: m3/hr
             """
             evaporation = season_selection() #mm/hr
             area_m2 = area * 10000
@@ -346,11 +346,15 @@ def page_two():
 
     with col2:
         st.header('Visualisatie')
-        st.write('[hier komt uitleg over wat je ziet]')
+        st.write('''In de grafiek hieronder is een simulatie te zien van de grond- en oppervlaktewater in de tijd.
+                  Met de slider kan aangegegeven worden welke tijdstap getoond moet worden, delijn verplaatst wel, 
+                 maar in een heel kleine mate.''')
         time = st.slider("Tijdverloop in uren",0,simulation_duration)
         visualise()
 
-        st.write('Dit is een titel')
+        st.write('''In deze grafiek is het verloop van de waterstand te zien door een neerslag evenenment. 
+                 De neerslag begint na 1 uur en valt daarna gedurende een uur, 
+                 waarbij de hoeveelheid wordt bepaald met het keuzemenu neerslag.''')
         plot_waterstand = px.line(model(), x='tijd', y= 'hoogte',
                                    labels= {'tijd': 'tijd (hr)', 'hoogte': 'peilstijging (m)'})
         # plot_volume = px.line(model(), x='tijd', y= 'volume')
@@ -724,16 +728,19 @@ def page_three():
 
     with col2:
         st.header('Visualisatie')
-        st.write('[hier komt uitleg over wat je ziet]')
+        st.write('''In de grafiek hieronder is een simulatie te zien van de grond- en oppervlaktewater in de tijd.
+                  Met de slider kan aangegegeven worden welke tijdstap getoond moet worden. Deze grafiek werkt het beste 
+                 als de grondsoort Veen is, en het percentage onverhard 1%. Verder is deze code vooral een vorm van magie.''')
                 
         model_df, fig = model()
         st.write(fig)
 
-        st.write('Dit is een titel')
+        st.write('''In deze grafiek is het verloop van de waterstand te zien door een neerslag evenenment. 
+                 De neerslag begint na 1 uur en valt daarna gedurende een uur, 
+                 waarbij de hoeveelheid wordt bepaald met het keuzemenu neerslag.''')
         plot_waterstand = px.line(model_df, x='tijd', y= 'hoogte', range_y= [-0.5, 0.5],
                                    labels= {'tijd': 'tijd (hr)', 'hoogte': 'peilstijging (m)'})
-        # plot_volume = px.line(model_df, x='tijd', y= 'volume')
-        
+                
         st.plotly_chart(plot_waterstand)
 
     with col3: 
