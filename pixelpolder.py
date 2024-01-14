@@ -741,15 +741,15 @@ def page_three():
 
 #Code to select a page and to visualise the appropriate information
 st.sidebar.write("""# Selectie menu""")
-menu = st.sidebar.radio('Selecteer een pagina', ('Welkom',  'Parameters', 'Visualisatie'))
+menu = st.sidebar.radio('Selecteer een pagina', ('Welkom',  'Model', 'Magie'))
 
 if menu == 'Welkom':
     page_one()     
     
-elif menu == 'Parameters':
+elif menu == 'Model':
     page_two()
     
-elif menu == 'Visualisatie':
+elif menu == 'Magie':
     page_three()
 #     page_two()
 #     page_three()    
