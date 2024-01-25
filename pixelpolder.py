@@ -316,7 +316,7 @@ def page_two():
 
             return output
 
-        def pump():
+        def pump(h):
             """
             The amount of water that gets pumped out
             Unit: m³/hr
@@ -324,7 +324,7 @@ def page_two():
             pumpcapacity_hr = pumpcapacity * 60
             
             return pumpcapacity_hr
-        
+
         t = 0
         dt = 0.5
         volume_0 = 50
@@ -407,6 +407,9 @@ def page_three():
 
         global seepage
         seepage = st.slider("Wat is de kwel (positief) of wegzijging (negatief) in mm/dag", min_value=-5, max_value=5, value= 0)
+        
+        global gauge
+        gauge = st.slider("Wat is het polderpeil?", 0.0, 1.0, step= 0.1)
 
 
     def rainfall_selection():
@@ -548,19 +551,23 @@ def page_three():
 
             return output
 
-        def pump():
+        def pump(h):
             """
             The amount of water that gets pumped out
             Unit: m³/hr
             """
             pumpcapacity_hr = pumpcapacity * 60
             
-            return pumpcapacity_hr
+            if h > 1.2 * gauge:
+                return pumpcapacity_hr
+            else:
+                return 0
         
         t = 0
         dt = 0.5
         volume_0 = 50
         t_eind = 24
+        h = 0
         
         t_list = []
         v_list = []
@@ -569,7 +576,7 @@ def page_three():
         area_water = area * 10000 * (percentage_water/100)
 
         while t < t_eind:
-            volume_0 = volume_0 + (precipitation_unpaved() + precipitation_paved(t) + precipitation_water(t) + seepage_in() - evaporation_water() - evaporation_unpaved() - pump()) * dt
+            volume_0 = volume_0 + (precipitation_unpaved() + precipitation_paved(t) + precipitation_water(t) + seepage_in() - evaporation_water() - evaporation_unpaved() - pump(h)) * dt
             h = volume_0 / area_water
             v_list.append(round(volume_0,2))
             t_list.append(t)
@@ -619,7 +626,7 @@ def page_three():
                 if h - hg < 0:
                     i = abs(h - hg) / (0.5 * L)
                     Q = (k * i) * 3600 * abs(h-hg) * 2
-                    volume0 = volume0 + (precipitation_paved(t=(hour+1)) + precipitation_water(t=(hour+1)) + seepage_in() + Q/L - evaporation_water() - evaporation_unpaved() - pump()) * dt
+                    volume0 = volume0 + (precipitation_paved(t=(hour+1)) + precipitation_water(t=(hour+1)) + seepage_in() + Q/L - evaporation_water() - evaporation_unpaved() - pump(h)) * dt
                     dh = volume_0 / area_water
                     h = yb + dh
                     hg = hg + P[hour]/1000 - E[hour]/1000 - Q/L
@@ -628,14 +635,14 @@ def page_three():
                 elif h - hg > 0:
                     i = abs(h - hg) / (0.5 * L)
                     Q = (k * i) * 3600 * abs(h-hg) * 2
-                    volume0 = volume0 + (precipitation_paved(t=(hour+1)) + precipitation_water(t=(hour+1)) + seepage_in() - Q/L - evaporation_water() - evaporation_unpaved() - pump()) * dt
+                    volume0 = volume0 + (precipitation_paved(t=(hour+1)) + precipitation_water(t=(hour+1)) + seepage_in() - Q/L - evaporation_water() - evaporation_unpaved() - pump(h)) * dt
                     dh = volume_0 / area_water
                     h = yb + dh
                     hg = hg + P[hour]/1000 - E[hour]/1000 + Q/L
                 
                 #If the groundwaterlevel and the waterlevel are equal, no water will move between the waterstorages
                 else:
-                    volume0 = volume0 + (precipitation_paved(t=(hour+1)) + precipitation_water(t=(hour+1)) + seepage_in() - evaporation_water() - evaporation_unpaved() - pump()) * dt
+                    volume0 = volume0 + (precipitation_paved(t=(hour+1)) + precipitation_water(t=(hour+1)) + seepage_in() - evaporation_water() - evaporation_unpaved() - pump(h)) * dt
                     dh = volume_0 / area_water
                     h = yb + dh
                     hg = hg + P[hour]/1000 - E[hour]/1000
