@@ -316,7 +316,7 @@ def page_two():
 
             return output
 
-        def pump(h):
+        def pump():
             """
             The amount of water that gets pumped out
             Unit: m³/hr
